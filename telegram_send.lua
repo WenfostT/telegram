@@ -50,11 +50,14 @@ local function async_http_request(url, args, resolve, reject)
     end)
 end
 
-function telegram.sendMessage(msg)
+function telegram.sendMessage(msg, options)
     if not chat_id or not token then return end
-    msg = msg:gsub('{......}', '')
-    msg = encodeUrl(msg)
-    async_http_request('https://api.telegram.org/bot' .. token .. '/sendMessage?chat_id=' .. chat_id .. '&text='..msg, '', function(result) end)
+    options = options or {} -- По умолчанию пустая таблица, если опции не переданы
+    msg = msg:gsub('{......}', '') -- Убираем цветовые коды
+    msg = encodeUrl(msg) -- Кодируем текст для URL
+    local parseMode = options.parse_mode or "Markdown" -- Используем Markdown по умолчанию
+    local url = 'https://api.telegram.org/bot' .. token .. '/sendMessage?chat_id=' .. chat_id .. '&text=' .. msg .. '&parse_mode=' .. parseMode
+    async_http_request(url, '', function(result) end)
 end
 
 function telegram.getLastUpdate()
